@@ -20,6 +20,7 @@ func main() {
 		log.Println(err.Error())
 	}
 	defer con.Close()
+
 	tags := make(map[string]string)
 	fields := make(map[string]interface{})
 	c := make(chan result)
@@ -28,7 +29,9 @@ func main() {
 		handler(w, r, c)
 	})
 	go saveToInfluxDB(con, tags, fields, c, wg)
+
 	wg.Wait()
+
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +44,7 @@ type result struct {
 }
 
 func handler(w http.ResponseWriter, r *http.Request, c chan result) {
+
 	if r.Method == "POST" {
 		id := r.FormValue("id")
 		temperature := r.FormValue("temperature")
@@ -57,35 +61,35 @@ func handler(w http.ResponseWriter, r *http.Request, c chan result) {
 }
 
 func saveToInfluxDB(con client.Client, tags map[string]string, fields map[string]interface{}, c chan result, wg *sync.WaitGroup) {
+
 	wg.Add(1)
 	defer wg.Done()
-	for {
-		bp, _ := client.NewBatchPoints(client.BatchPointsConfig{
-			Database:  "sensor",
-			Precision: "",
-		})
-		for r := range c {
-			id := r.id
-			temperature := r.temperature
-			humidity := r.humidity
-			fields["id"] = id
-			fields["temperature"] = temperature
-			fields["humidity"] = humidity
-			newPoint, err := client.NewPoint(
-				"sensor",
-				tags,
-				fields,
-				time.Now(),
-			)
-			if err != nil {
-				log.Println(err.Error())
-			}
-			bp.AddPoint(newPoint)
-			err = con.Write(bp)
-			if err != nil {
-				log.Println(err.Error())
-			}
-		}
 
+	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{
+		Database:  "sensor",
+		Precision: "",
+	})
+
+	for r := range c {
+		id := r.id
+		temperature := r.temperature
+		humidity := r.humidity
+		fields["id"] = id
+		fields["temperature"] = temperature
+		fields["humidity"] = humidity
+		newPoint, err := client.NewPoint(
+			"sensor",
+			tags,
+			fields,
+			time.Now(),
+		)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		bp.AddPoint(newPoint)
+		err = con.Write(bp)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 }
