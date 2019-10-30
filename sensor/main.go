@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"math/rand"
 	"os"
@@ -15,15 +16,16 @@ func main() {
 	ctx := context.Background()
 	wg := &sync.WaitGroup{}
 
-	sensorCount := 10
-	workerCount := 1
+	sensorCount := flag.Int("sensorCount", 100, "sensor count")
+	workerCount := flag.Int("workerCount", 5, "worker count")
+	flag.Parse()
 
 	c := make(chan result)
 
-	for a := 0; a < workerCount; a++ {
+	for a := 0; a < *workerCount; a++ {
 		go worker(ctx, wg, c)
 	}
-	for i := 0; i < sensorCount; i++ {
+	for i := 0; i < *sensorCount; i++ {
 		go sensor(ctx, wg, c)
 	}
 
@@ -32,7 +34,7 @@ func main() {
 	d := <-done
 	ctx.Done()
 	log.Println("Sensor emulator stopped. Signal: ", d)
-	for i := 0; i < sensorCount+workerCount; i++ {
+	for i := 0; i < *sensorCount+*workerCount; i++ {
 		wg.Done()
 	}
 	wg.Wait()
