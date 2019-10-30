@@ -64,7 +64,6 @@ func saveToInfluxDB(con client.Client, tags map[string]string, fields map[string
 			Database:  "sensor",
 			Precision: "",
 		})
-		//for i := 0; i < 100; i++ {
 		for r := range c {
 			id := r.id
 			temperature := r.temperature
@@ -87,7 +86,6 @@ func saveToInfluxDB(con client.Client, tags map[string]string, fields map[string
 				log.Println(err.Error())
 			}
 		}
-		//}
 
 	}
 }
