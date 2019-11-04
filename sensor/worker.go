@@ -1,15 +1,21 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
-	"net/url"
 	"sync"
 )
 
+type resultToSend struct {
+	ID          string
+	Temperature float32
+	Humidity    float32
+}
+
 func worker(ctx context.Context, wg *sync.WaitGroup, c chan result) {
-	wg.Add(1)
 	defer wg.Done()
 	for {
 		select {
@@ -19,16 +25,25 @@ func worker(ctx context.Context, wg *sync.WaitGroup, c chan result) {
 		}
 
 		for result := range c {
-			clientID := result.clientID
-			temperature := result.temperature
-			humidity := result.humidity
+			b := new(bytes.Buffer)
+			r := &resultToSend{
+				ID:          result.clientID,
+				Temperature: result.temperature,
+				Humidity:    result.humidity,
+			}
 
-			resp, err := http.PostForm("http://localhost:8080/",
-				url.Values{"id": {clientID}, "temperature": {temperature}, "humidity": {humidity}})
+			err := json.NewEncoder(b).Encode(r)
+			if err != nil {
+				log.Println(err.Error())
+			}
+
+			log.Println(b)
+
+			resp, err := http.Post("http://localhost:8080/", "application/json;charset=utf-8", b)
 			if err != nil {
 				log.Fatal(err)
 			}
-			resp.Body.Close()
+			defer resp.Body.Close()
 		}
 	}
 }

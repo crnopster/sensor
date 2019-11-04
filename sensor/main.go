@@ -19,7 +19,7 @@ func main() {
 	sensorCount := flag.Int("sensorCount", 100, "sensor count")
 	workerCount := flag.Int("workerCount", 5, "worker count")
 	flag.Parse()
-
+	wg.Add(*sensorCount + *workerCount)
 	c := make(chan result)
 
 	for a := 0; a < *workerCount; a++ {

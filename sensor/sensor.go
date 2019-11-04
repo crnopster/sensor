@@ -15,18 +15,17 @@ var defaulthumidity float32 = 50
 
 type result struct {
 	clientID    string
-	temperature string
-	humidity    string
+	temperature float32
+	humidity    float32
 }
 
 func sensor(ctx context.Context, wg *sync.WaitGroup, c chan result) {
 	temperature := defaulttemperature
 	humidity := defaulthumidity
 
-	wg.Add(1)
 	defer wg.Done()
 	clientID := fmt.Sprint(uuid.New())
-	r := new(result)
+
 	for {
 		hourTemperature := float32(rand.Intn(41))
 		hourHimidity := float32(rand.Intn(70) + 20)
@@ -41,9 +40,11 @@ func sensor(ctx context.Context, wg *sync.WaitGroup, c chan result) {
 			}
 			temperature = temperature + x
 			humidity = humidity + y
-			r.clientID = clientID
-			r.temperature = fmt.Sprintf("%v", temperature)
-			r.humidity = fmt.Sprintf("%v", humidity)
+			r := &result{
+				clientID:    clientID,
+				temperature: temperature,
+				humidity:    humidity,
+			}
 			c <- *r
 			time.Sleep(time.Second * 10)
 		}

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"sync"
@@ -10,7 +12,11 @@ import (
 )
 
 func main() {
+	influxSaver := flag.Int("influxSaver", 10, "number of saveToInfluxDB goroutines")
+	flag.Parse()
+
 	wg := &sync.WaitGroup{}
+
 	con, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr:     "http://localhost:8086",
 		Username: "sensors",
@@ -22,47 +28,48 @@ func main() {
 	defer con.Close()
 
 	tags := make(map[string]string)
-	fields := make(map[string]interface{})
 	c := make(chan result)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		handler(w, r, c)
 	})
-	go saveToInfluxDB(con, tags, fields, c, wg)
 
-	wg.Wait()
+	wg.Add(*influxSaver)
+	for i := 0; i < *influxSaver; i++ {
+		go saveToInfluxDB(con, tags, c, wg)
+	}
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
 	}
+
+	wg.Wait()
+
 }
 
 type result struct {
-	id          string
-	temperature string
-	humidity    string
+	ID          string
+	Temperature float32
+	Humidity    float32
 }
 
 func handler(w http.ResponseWriter, r *http.Request, c chan result) {
 
 	if r.Method == "POST" {
-		id := r.FormValue("id")
-		temperature := r.FormValue("temperature")
-		humidity := r.FormValue("humidity")
-		time := time.Now()
-		log.Println(id, temperature, humidity, time)
-		r := new(result)
-		r.id = id
-		r.temperature = temperature
-		r.humidity = humidity
-		c <- *r
+		var res result
+		err := json.NewDecoder(r.Body).Decode(&res)
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		c <- res
 
 	}
 }
 
-func saveToInfluxDB(con client.Client, tags map[string]string, fields map[string]interface{}, c chan result, wg *sync.WaitGroup) {
+func saveToInfluxDB(con client.Client, tags map[string]string, c chan result, wg *sync.WaitGroup) {
+	fields := make(map[string]interface{})
 
-	wg.Add(1)
 	defer wg.Done()
 
 	bp, _ := client.NewBatchPoints(client.BatchPointsConfig{
@@ -70,13 +77,11 @@ func saveToInfluxDB(con client.Client, tags map[string]string, fields map[string
 		Precision: "",
 	})
 
-	for r := range c {
-		id := r.id
-		temperature := r.temperature
-		humidity := r.humidity
-		fields["id"] = id
-		fields["temperature"] = temperature
-		fields["humidity"] = humidity
+	for res := range c {
+		fields["id"] = res.ID
+		fields["temperature"] = res.Temperature
+		fields["humidity"] = res.Humidity
+		log.Println(res.ID, res.Temperature, res.Humidity)
 		newPoint, err := client.NewPoint(
 			"sensor",
 			tags,
