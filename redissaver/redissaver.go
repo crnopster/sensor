@@ -52,7 +52,7 @@ func (r *RedisConn) redisWorker(ctx context.Context, wg *sync.WaitGroup) {
 }
 
 // Worker calls redisWorker to save data into redisDB
-func (r RedisConn) Worker(ctx context.Context, wg *sync.WaitGroup, workerCount int) {
+func (r *RedisConn) Worker(ctx context.Context, wg *sync.WaitGroup, workerCount int) {
 	wg.Add(workerCount)
 	for i := 0; i < workerCount; i++ {
 		go r.redisWorker(ctx, wg)

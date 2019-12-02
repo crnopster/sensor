@@ -10,7 +10,10 @@ func main() {
 	defer cancel()
 	wg := &sync.WaitGroup{}
 	c := make(chan metric, 1)
-	wg.Add(2)
-	go worker(ctx, wg, c)
-	go temperature(ctx, wg, c)
+	wg.Add(10)
+	for i := 0; i < 5; i++ {
+		go worker(ctx, wg, c)
+		go temperature(ctx, wg, c)
+	}
+	wg.Wait()
 }
