@@ -1,3 +1,5 @@
 github.com/crnopster/sensor v0.0.0-20191105162001-714aebba80a4 h1:id0DdESTux7hdJ0qEu2hnDjr48vVakJ127TV/vkrUE0=
+github.com/crnopster/sensor v0.0.0-20191202143201-ee88868a6412 h1:Pno/ubE5suF6sEoklHP47I/+LsCGqKbyOQ/3YyDEWo8=
+github.com/crnopster/sensor v0.0.0-20191202143201-ee88868a6412/go.mod h1:hhB4gmn8AI3Q6HB/6+Qam47Fxw0tlvS6q1tLRqAOOiM=
 github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=

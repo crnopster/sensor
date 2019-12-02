@@ -49,7 +49,7 @@ func main() {
 	// Graceful shutdown
 	go shutdown(ctx, cancel, &srv, wg)
 
-	s := server{storages: []saver{i}}
+	s := server{storages: []saver{i, r}}
 
 	http.HandleFunc("/", s.handler)
 	if err := srv.ListenAndServe(); err != nil {
