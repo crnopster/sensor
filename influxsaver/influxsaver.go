@@ -61,6 +61,9 @@ func (i *InfluxConn) influxWorker(ctx context.Context, wg *sync.WaitGroup) {
 // Worker calls influxWorker to save data into influxDB
 func (i InfluxConn) Worker(ctx context.Context, wg *sync.WaitGroup, workerCount int) {
 	wg.Add(workerCount)
+	for a := 0; a < workerCount; a++ {
+		go i.influxWorker(ctx, wg)
+	}
 }
 
 // NewInfluxClient returns connect to influxDB & metric chan
