@@ -5,7 +5,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/crnopster/sensorv3/metric"
+	"github.com/crnopster/sensor/metric"
 	influx "github.com/influxdata/influxdb1-client/v2"
 )
 
