@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/crnopster/sensorv3/metric"
+	"github.com/crnopster/sensor/metric"
 	"github.com/go-redis/redis/v7"
 	jsoniter "github.com/json-iterator/go"
 )
