@@ -7,29 +7,36 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
+
+	uuid "github.com/google/uuid"
 )
 
-type resultToSend struct {
-	ID          string
-	Temperature float32
-	Humidity    float32
+type metricToSend struct {
+	UUID      uuid.UUID `json:"uuid"`
+	Type      string    `json:"type"`
+	Data      float32   `json:"data"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
-func worker(ctx context.Context, wg *sync.WaitGroup, c chan result) {
+func worker(ctx context.Context, wg *sync.WaitGroup, c chan metric) {
+	log.Println("worker started")
 	defer wg.Done()
 	for {
 		select {
 		case <-ctx.Done():
+			log.Println("worker stopped")
 			return
 		default:
 		}
 
 		for result := range c {
 			b := new(bytes.Buffer)
-			r := &resultToSend{
-				ID:          result.clientID,
-				Temperature: result.temperature,
-				Humidity:    result.humidity,
+			r := &metricToSend{
+				UUID:      result.ID,
+				Type:      result.Type,
+				Data:      result.Data,
+				Timestamp: result.Timestamp,
 			}
 
 			err := json.NewEncoder(b).Encode(r)
@@ -37,12 +44,11 @@ func worker(ctx context.Context, wg *sync.WaitGroup, c chan result) {
 				log.Println(err.Error())
 			}
 
-			log.Println(b)
-
-			resp, err := http.Post("http://localhost:8080/", "application/json;charset=utf-8", b)
+			resp, err := http.Post("http://localhost:8080/", "application/json", b)
 			if err != nil {
 				log.Fatal(err)
 			}
+
 			defer resp.Body.Close()
 		}
 	}

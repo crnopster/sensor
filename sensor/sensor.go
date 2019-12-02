@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -10,43 +9,101 @@ import (
 	uuid "github.com/google/uuid"
 )
 
-var defaulttemperature float32 = 20
-var defaulthumidity float32 = 50
+var defaultTemperature float32 = 20
+var defaultHumidity float32 = 50
+var defaultO2 float32 = 25
 
-type result struct {
-	clientID    string
-	temperature float32
-	humidity    float32
+type metric struct {
+	ID        uuid.UUID
+	Data      float32
+	Type      string
+	Timestamp time.Time
 }
 
-func sensor(ctx context.Context, wg *sync.WaitGroup, c chan result) {
-	temperature := defaulttemperature
-	humidity := defaulthumidity
-
+func temperature(ctx context.Context, wg *sync.WaitGroup, c chan metric) {
+	t := "temperature"
+	temp := defaultTemperature
+	ID := uuid.New()
 	defer wg.Done()
-	clientID := fmt.Sprint(uuid.New())
 
 	for {
 		hourTemperature := float32(rand.Intn(41))
-		hourHimidity := float32(rand.Intn(70) + 20)
-		x := (hourTemperature - temperature) / 360
-		y := (hourHimidity - humidity) / 360
+		step := (hourTemperature - temp) / 360
 		for i := 0; i < 360; i++ {
 			select {
 			case <-ctx.Done():
-				time.Sleep(time.Millisecond * 100)
+				time.Sleep(time.Second)
 				return
 			default:
+				temp = temp + step
+				result := &metric{
+					ID:        ID,
+					Data:      temp,
+					Type:      t,
+					Timestamp: time.Now(),
+				}
+				c <- *result
+				time.Sleep(time.Second * 10)
 			}
-			temperature = temperature + x
-			humidity = humidity + y
-			r := &result{
-				clientID:    clientID,
-				temperature: temperature,
-				humidity:    humidity,
+		}
+	}
+}
+
+func humidity(ctx context.Context, wg *sync.WaitGroup, c chan metric) {
+	t := "humidity"
+	hum := defaultHumidity
+	ID := uuid.New()
+	defer wg.Done()
+
+	for {
+		hourHumidity := float32(rand.Intn(71) + 20)
+		step := (hourHumidity - hum) / 360
+		for i := 0; i < 360; i++ {
+			select {
+			case <-ctx.Done():
+				time.Sleep(time.Second)
+				return
+			default:
+				hum = hum + step
+				result := &metric{
+					ID:        ID,
+					Data:      hum,
+					Type:      t,
+					Timestamp: time.Now(),
+				}
+				c <- *result
+				time.Sleep(time.Second * 10)
 			}
-			c <- *r
-			time.Sleep(time.Second * 10)
+		}
+	}
+}
+
+func oxygen(ctx context.Context, wg *sync.WaitGroup, c chan metric) {
+	t := "oxygen"
+	O2 := defaultO2
+	ID := uuid.New()
+	defer wg.Done()
+
+	for {
+		hourO2 := float32(rand.Intn(5) + 20)
+		step := (hourO2 - O2) / 360
+		for i := 0; i < 360; i++ {
+			select {
+			case <-ctx.Done():
+				time.Sleep(time.Second)
+				return
+			default:
+				O2 = O2 + step
+				result := &metric{
+					ID:        ID,
+					Data:      O2,
+					Type:      t,
+					Timestamp: time.Now(),
+				}
+				c <- *result
+				time.Sleep(time.Second * 10)
+
+			}
 		}
 	}
 }

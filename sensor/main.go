@@ -2,44 +2,15 @@ package main
 
 import (
 	"context"
-	"flag"
-	"log"
-	"math/rand"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
-	"time"
 )
 
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	wg := &sync.WaitGroup{}
-
-	sensorCount := flag.Int("sensorCount", 100, "sensor count")
-	workerCount := flag.Int("workerCount", 5, "worker count")
-	flag.Parse()
-	wg.Add(*sensorCount + *workerCount)
-	c := make(chan result)
-
-	for a := 0; a < *workerCount; a++ {
-		go worker(ctx, wg, c)
-	}
-	for i := 0; i < *sensorCount; i++ {
-		go sensor(ctx, wg, c)
-	}
-
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	d := <-done
-	ctx.Done()
-	log.Println("Sensor emulator stopped. Signal: ", d)
-	for i := 0; i < *sensorCount+*workerCount; i++ {
-		wg.Done()
-	}
-	wg.Wait()
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
+	c := make(chan metric, 1)
+	wg.Add(2)
+	go worker(ctx, wg, c)
+	go temperature(ctx, wg, c)
 }
