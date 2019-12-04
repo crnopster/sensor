@@ -3,13 +3,13 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	uuid "github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type metricToSend struct {
@@ -39,7 +39,7 @@ func worker(ctx context.Context, wg *sync.WaitGroup, c chan metric) {
 				Timestamp: result.Timestamp,
 			}
 
-			err := json.NewEncoder(b).Encode(r)
+			err := jsoniter.NewEncoder(b).Encode(r)
 			if err != nil {
 				log.Println(err.Error())
 			}

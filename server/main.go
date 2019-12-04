@@ -24,24 +24,24 @@ type server struct {
 
 func main() {
 
-	redisWorkers := flag.Int("redisWorkers", 1, "number of redisworker goroutines")
-	influxWorkers := flag.Int("influxWorkers", 1, "number of influxworker goroutines")
+	redisWorkers := flag.Int("redisWorkers", 5, "number of redisworker goroutines")
+	influxWorkers := flag.Int("influxWorkers", 5, "number of influxworker goroutines")
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
-
-	// connect to redis
-	r := redissaver.NewRedisClient()
-	defer r.Client.Close()
-	// start redisworkers
-	r.Worker(ctx, wg, *redisWorkers)
 
 	// connect to influx
 	i := influxsaver.NewInfluxClient()
 	defer i.Client.Close()
 	// start influxworkers
 	i.Worker(ctx, wg, *influxWorkers)
+
+	// connect to redis
+	r := redissaver.NewRedisClient()
+	defer r.Client.Close()
+	// start redisworkers
+	r.Worker(ctx, wg, *redisWorkers)
 
 	wg.Add(2)
 

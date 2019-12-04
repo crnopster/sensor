@@ -1,10 +1,10 @@
-github.com/crnopster/sensor v0.0.0-20191202150301-ced2266f81fa h1:CZPTrHbvrHHc70WF5kwgwPzA1hDODtjQioDQrczM6Xo=
-github.com/crnopster/sensor/influxsaver v0.0.0-20191202150301-ced2266f81fa h1:Lf4sKYE1OTbGONAFAd14qIACrlQMxUiQlM1Fc5IZeN0=
-github.com/crnopster/sensor/influxsaver v0.0.0-20191202150301-ced2266f81fa/go.mod h1:IUSiKO3HwSx2vleof20ynZcJz+uuzGLU1qIlcm2Jun4=
-github.com/crnopster/sensor/metric v0.0.0-20191202150301-ced2266f81fa h1:f2PHD4ngELcB0RrngRq3R4BlKAmFcpRRjLmcrTfyMGo=
-github.com/crnopster/sensor/metric v0.0.0-20191202150301-ced2266f81fa/go.mod h1:jmxmWkKlhFVXeSTzN2XetRrwG6tt6jrrfwb/5BlFLe0=
-github.com/crnopster/sensor/redissaver v0.0.0-20191202150301-ced2266f81fa h1:l6rshSvUVNNOn2N87Nlr7kit8Axjxpuoyu0Jy1TMihE=
-github.com/crnopster/sensor/redissaver v0.0.0-20191202150301-ced2266f81fa/go.mod h1:3LuxSgbHM5pf6ixuX+DlB5doFzm8g9O6GioV/BtPWgY=
+github.com/crnopster/sensor v0.0.0-20191202161029-6f7d8aee55bd h1:45bBknpbdlLcQ2haQCI2hB81YfztQgdy3qD8Ol6t4z0=
+github.com/crnopster/sensor/influxsaver v0.0.0-20191202161029-6f7d8aee55bd h1:k5EjowlPcjzbKIsVZJ5GK+MAZ2Qc8oy5lCxu7T+8p/M=
+github.com/crnopster/sensor/influxsaver v0.0.0-20191202161029-6f7d8aee55bd/go.mod h1:IUSiKO3HwSx2vleof20ynZcJz+uuzGLU1qIlcm2Jun4=
+github.com/crnopster/sensor/metric v0.0.0-20191202161029-6f7d8aee55bd h1:VAHju0U4NBLLo+J6mjfXQieHfY+hgEjjeiH9giv20Nc=
+github.com/crnopster/sensor/metric v0.0.0-20191202161029-6f7d8aee55bd/go.mod h1:jmxmWkKlhFVXeSTzN2XetRrwG6tt6jrrfwb/5BlFLe0=
+github.com/crnopster/sensor/redissaver v0.0.0-20191202161029-6f7d8aee55bd h1:k3ELz40jOoBAbKAyuGc9X1iUc0J6rCGOVNWjDqqdHgg=
+github.com/crnopster/sensor/redissaver v0.0.0-20191202161029-6f7d8aee55bd/go.mod h1:3LuxSgbHM5pf6ixuX+DlB5doFzm8g9O6GioV/BtPWgY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
