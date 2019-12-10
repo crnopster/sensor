@@ -32,6 +32,7 @@ func (mc *MqttConn) mqttWorker(ctx context.Context, wg *sync.WaitGroup, topic st
 		default:
 			for m := range mc.C {
 				mc.Client.Publish(topic, 16, false, m)
+				log.Println("sent to mqtt broker")
 			}
 		}
 	}
