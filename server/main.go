@@ -8,10 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/crnopster/sensor/influxsaver"
 	"github.com/crnopster/sensor/metric"
-	"github.com/crnopster/sensor/mqttsaver"
-	"github.com/crnopster/sensor/redissaver"
 )
 
 type saver interface {
@@ -34,30 +31,14 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
 
-	// connect to influx
-	i := influxsaver.NewInfluxClient()
-	defer i.Client.Close()
-	// start influxWorkers
-	i.Worker(ctx, wg, *influxWorkers)
-
-	// connect to redis
-	r := redissaver.NewRedisClient()
-	defer r.Client.Close()
-	// start redisWorkers
-	r.Worker(ctx, wg, *redisWorkers)
-
-	// connect to mqtt broker
-	mc := mqttsaver.NewMqttClient()
-	defer mc.Client.Disconnect(100)
-	// start mqttWorkers
-	mc.Worker(ctx, wg, *mqttWorkers, *topic)
-
 	wg.Add(2)
 	srv := http.Server{Addr: ":8080"}
 	// Graceful shutdown
 	go shutdown(ctx, cancel, &srv, wg)
 
-	s := server{storages: []saver{i, r}}
+	i, r, mc := start(ctx, wg, *redisWorkers, *influxWorkers, *mqttWorkers, *topic)
+
+	s := server{storages: []saver{i, r, mc}}
 
 	http.HandleFunc("/", s.handler)
 	if err := srv.ListenAndServe(); err != nil {
