@@ -47,11 +47,10 @@ func (mc *MqttConn) Worker(ctx context.Context, wg *sync.WaitGroup, workerCount 
 }
 
 // NewMqttClient returns connect to local mqtt broker & metric chan
-func NewMqttClient() MqttConn {
+func NewMqttClient() *MqttConn {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker("tcp://localhost")
-	opts.SetClientID("SomeClientID")
-	opts.SetPassword("SomePassword")
+	opts.SetUsername("sensor")
 
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
@@ -61,7 +60,7 @@ func NewMqttClient() MqttConn {
 		log.Fatal(err)
 	}
 	c := make(chan metric.Metric, 1)
-	return MqttConn{
+	return &MqttConn{
 		Client: client,
 		C:      c,
 	}
