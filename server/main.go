@@ -10,6 +10,7 @@ import (
 
 	"github.com/crnopster/sensor/influxsaver"
 	"github.com/crnopster/sensor/metric"
+	"github.com/crnopster/sensor/mqttsaver"
 	"github.com/crnopster/sensor/redissaver"
 )
 
@@ -26,6 +27,8 @@ func main() {
 
 	redisWorkers := flag.Int("redisWorkers", 5, "number of redisworker goroutines")
 	influxWorkers := flag.Int("influxWorkers", 5, "number of influxworker goroutines")
+	mqttWorkers := flag.Int("mqttWorkers", 5, "number of mqttWorker goroutines")
+	topic := flag.String("topic", "test", "mqtt topic")
 	flag.Parse()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -34,17 +37,22 @@ func main() {
 	// connect to influx
 	i := influxsaver.NewInfluxClient()
 	defer i.Client.Close()
-	// start influxworkers
+	// start influxWorkers
 	i.Worker(ctx, wg, *influxWorkers)
 
 	// connect to redis
 	r := redissaver.NewRedisClient()
 	defer r.Client.Close()
-	// start redisworkers
+	// start redisWorkers
 	r.Worker(ctx, wg, *redisWorkers)
 
-	wg.Add(2)
+	// connect to mqtt broker
+	mc := mqttsaver.NewMqttClient()
+	defer mc.Client.Disconnect(100)
+	// start mqttWorkers
+	mc.Worker(ctx, wg, *mqttWorkers, *topic)
 
+	wg.Add(2)
 	srv := http.Server{Addr: ":8080"}
 	// Graceful shutdown
 	go shutdown(ctx, cancel, &srv, wg)
