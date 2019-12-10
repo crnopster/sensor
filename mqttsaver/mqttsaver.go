@@ -49,7 +49,7 @@ func (mc *MqttConn) Worker(ctx context.Context, wg *sync.WaitGroup, workerCount 
 // NewMqttClient returns connect to local mqtt broker & metric chan
 func NewMqttClient() *MqttConn {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker("tcp://localhost")
+	opts.AddBroker("tcp://localhost:1883")
 	opts.SetUsername("sensor")
 
 	client := mqtt.NewClient(opts)
