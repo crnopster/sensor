@@ -38,6 +38,10 @@ func main() {
 
 	i, r, mc := start(ctx, wg, *redisWorkers, *influxWorkers, *mqttWorkers, *topic)
 
+	defer i.Client.Close()
+	defer r.Client.Close()
+	defer mc.Client.Disconnect(100)
+
 	s := server{storages: []saver{i, r, mc}}
 
 	http.HandleFunc("/", s.handler)

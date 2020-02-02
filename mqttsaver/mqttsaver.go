@@ -2,6 +2,7 @@ package mqttsaver
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -29,11 +30,10 @@ func (mc *MqttConn) mqttWorker(ctx context.Context, wg *sync.WaitGroup, topic st
 		case <-ctx.Done():
 			log.Println("mqttWorker stopped")
 			return
-		default:
-			for m := range mc.C {
-				mc.Client.Publish(topic, 16, false, m)
-				log.Println("sent to mqtt broker")
-			}
+		case m := <-mc.C:
+			ms := fmt.Sprintf("UUID:%v, Type:%v, Value%v, Time:%v", m.UUID, m.Type, m.Data, m.Timestamp)
+			mc.Client.Publish(topic, 0, false, ms)
+			log.Println("sent to mqtt broker")
 		}
 	}
 }
