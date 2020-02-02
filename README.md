@@ -1,1 +1,4 @@
-# Golang learning practice
+# Golang learning practice  
+  
+Use it on your own risk
+
